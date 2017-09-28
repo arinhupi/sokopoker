@@ -27,10 +27,10 @@ public:
         void autoPlay(int);
 private:
        	void initPlayers(std::vector<Player*>& players);
-        void deal(std::vector<Player*>&, CardDeck&, int);
+        void deal(std::vector<Player*>& players, CardDeck& deck, int count, int round);
         void resetPlayerCards(std::vector<Player*>& pl);
         PokRes findBestHand(const std::vector<Player*>&, int startIndex);
-        void showResultsOfRound(std::vector<Player*>&, int potti);
+        void showResultsOfRound(std::vector<Player*>&, int potti, int round);
         void dispAllCards(const std::vector<Player*>&, int round);
         void dispHands(const std::vector<Player*>& pl);
         int takeBets(std::vector<Player*>&, int round, int pot);
@@ -38,7 +38,7 @@ private:
         void resetPlayerStatusAndCards(std::vector<Player*>& pl);
         int activePlayers(const std::vector<Player*>& pl);
         bool checkBets(const std::vector<Player*>& pl, const std::vector<int>& bets);
-        int checkPlayerBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets);
+        int getMinBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets);
         int getMaxBet(const std::vector<Player*>& pl, const std::vector<int>& bets);
         int highestScoreId(std::vector<PokerHand>&);
 };

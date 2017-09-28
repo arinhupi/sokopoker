@@ -30,7 +30,12 @@ bool compareByScore(const PokRes& a, const PokRes& b) {
 	return a.score < b.score;
 }
 
-void SokoGame::deal(std::vector<Player*>& pl, CardDeck& deck, int count) {
+void SokoGame::deal(std::vector<Player*>& pl, CardDeck& deck, int count, int round) {
+	if (round == 2)
+		std::cout << "\nDealing first two cards\n";
+	else if (round >2)
+		std::cout << "\nDealing next card\n";
+
 	for (int i = 0; i < count; i++) {
 		for (unsigned int j = 0; j < pl.size(); j++) {
 			if (pl.at(j)->getGameStatus() == true) {
@@ -62,7 +67,7 @@ int SokoGame::takeBets(std::vector<Player*>& pl, int round, int pot) {
 	std::vector<int> bets;
 	bets.assign(pl.size(), 0);
 	PokRes pr = findBestHand(pl, EXCLUDE_FIRST_CARD);
-	std::cout << "Pot on this round now: " << pot << std::endl;
+	std::cout << "Pot now: " << pot << " euros\n";
 	std::cout << "Player with best hand starts betting: "
 			<< pl.at(pr.player)->getPlayerName() << "\n";
 	unsigned int i = pr.player;
@@ -70,7 +75,7 @@ int SokoGame::takeBets(std::vector<Player*>& pl, int round, int pot) {
 	do {
 		unsigned int playerId = i % pl.size();
 		if (pl.at(playerId)->getGameStatus() == true) {
-			minBet = checkPlayerBet(pl, playerId, bets);
+			minBet = getMinBet(pl, playerId, bets);
 			maxBet = getMaxBet(pl, bets);
 			curBet = pl.at(playerId)->bet(minBet, maxBet, round, pr.score);
 			bets.at(playerId) += curBet;
@@ -116,7 +121,7 @@ int SokoGame::forceBet(std::vector<Player*>& pl, int bet) {
 	return potti;
 }
 
-int SokoGame::checkPlayerBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets) {
+int SokoGame::getMinBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets) {
 	int playerBet = bets.at(plIndex), highestBet = 0;
 	if (pl.at(plIndex)->getGameStatus() == false)
 		return 0;
@@ -149,7 +154,6 @@ void SokoGame::dispAllCards(const std::vector<Player*>& pl, int round) {
 	if (round == 1)
 		return;
 
-	std::cout << "\nDealing next card\n";
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true) {
 			std::cout << "Player " << pl.at(i)->getPlayerName() << " ("
@@ -206,14 +210,13 @@ void SokoGame::initPlayers(std::vector<Player*>& players) {
 	players.push_back(player3);
 }
 
-void SokoGame::showResultsOfRound(std::vector<Player*>& players, int potti) {
+void SokoGame::showResultsOfRound(std::vector<Player*>& players, int potti, int round) {
 	std::cout << "\n---- Results ----\n";
-	dispHands(players);
+	if (round == 5)
+		dispHands(players);
 	PokRes pr = findBestHand(players, INCLUDE_ALL_CARDS);
 	players.at(pr.player)->addMoney(potti);
-	std::cout << "Winner is " << players.at(pr.player)->getPlayerName()
-			<< "\n\n";
-
+	std::cout << "The winner is " << players.at(pr.player)->getPlayerName() << "\n\n";
 }
 
 void SokoGame::play() {
@@ -224,19 +227,19 @@ void SokoGame::play() {
 	initPlayers(players);
 
 	do {
-		int pot = 0;
+		int pot = 0, cardNr;
 		deck.shuffle();
 		resetPlayerStatusAndCards(players);
 		if (players.at(0)->getGameStatus() == false || activePlayers(players) == 1)
 			break;
-		for (int i = 1; i <= 5; i++) {
-			deal(players, deck, 1);
-			dispAllCards(players, i);
-			pot += takeBets(players, i, pot);
+		for (cardNr = 1; cardNr <= 5; cardNr++) {
+			deal(players, deck, 1, cardNr);
+			dispAllCards(players, cardNr);
+			pot += takeBets(players, cardNr, pot);
 			if (activePlayers(players) == 1)
 				break;
 		}
-		showResultsOfRound(players, pot);
+		showResultsOfRound(players, pot, --cardNr);
 
 		std::cout << "Again (y/n)?\n";
 		std::cin >> qstring;

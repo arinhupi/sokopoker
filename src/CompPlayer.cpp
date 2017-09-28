@@ -31,39 +31,86 @@ void CompPlayer::changeCards(CardDeck& deck) {
 	std::cout << "Changed " << changed << " cards for player " << getPlayerName() <<"\n";
 }
 
-// needs major improvement
 int CompPlayer::bet(int minBet, int maxBet, int round, int bestScore){
-	PokerHand ph;
-	int betMoney, score;
-	ph.getScoreOfHand(playerCards, 0);
-	score = ph.getScore();
+	PokerHand phFull, phFour;
+	int betMoney, scoreFull, scoreFour;
+	phFull.getScoreOfHand(playerCards, 0);
+	phFour.getScoreOfHand(playerCards, 1);
+	scoreFull = phFull.getScore();
+	scoreFour = phFour.getScore();
+	bool quit = false;
 
+	// someone has run out of money - bet=0 the rest of this deal
 	if (maxBet == 0)
 		betMoney = 0;
-	else if (minBet == 0){
-		if (score >= bestScore && score > PAIR)
+
+	// start betting with best visible hand
+	else if (minBet == 0 && scoreFour >= bestScore){
+		// player has best visible hand at the moment
+		if (scoreFull > PAIR)
 			betMoney = std::min(10, maxBet);
+		else if (scoreFull >= HIGH_CARD + 0x10*11)
+			betMoney = std::min(5, maxBet);
 		else
-			betMoney = 5;
-	}
-	else if (minBet > 0){
-		if (ph.getScore() >= bestScore)
-			betMoney = minBet;
-		else if (round <=3 && ph.getScore() >= HIGH_CARD + 0x10*11)
-			betMoney = minBet;
-		else if (round >=3 && ph.getScore() >= TWO_PAIRS)
-			betMoney = minBet;
-		else {
-			setGameStatus(false);
-			std::cout << getPlayerName() << " quits\n";
 			betMoney = 0;
-		}
 	}
-	std::cout << getPlayerName() <<" is betting " << betMoney << std::endl;
-	reduceMoney(betMoney);
+
+	// not best visible hand, other players bet 0
+	else if (minBet == 0 && scoreFour < bestScore){
+		if (scoreFull > STRAIGHT_OF_FOUR)
+				betMoney = std::min(5, maxBet);
+		else
+			betMoney = 0;
+	}
+
+	// other players betting > 0. Call, raise or quit.
+	else if (minBet > 0){
+		if (	(scoreFull >= bestScore) ||
+				(round <=2 && scoreFull >= HIGH_CARD + 0x10*11) ||
+				(round == 3 && scoreFull >= PAIR) ||
+				(round >=4 && scoreFull >= STRAIGHT_OF_FOUR)
+		){
+			if (evalBetWithMoney(round, minBet))
+				betMoney = minBet;
+			else // cards ok, but bet too high, quit
+				quit = true;
+		}
+		else // not good enough cards to pay
+			quit = true;
+
+	}
+
+	if (quit){
+		setGameStatus(false);
+		std::cout << getPlayerName() << " quits\n";
+		betMoney = 0;
+	}
+	else {
+		std::cout << getPlayerName() <<" is betting " << betMoney << std::endl;
+		reduceMoney(betMoney);
+	}
 	return betMoney;
 }
 
 void CompPlayer::dispCards(bool hideFirst){
 	playerCards.dispCards3(true);
+}
+
+bool CompPlayer::evalBetWithMoney(int round, int minBet){
+	int maxPossibleBet;
+	int minPossibleBet = std::min(5, getMoney());
+
+	if (round <=2)
+		maxPossibleBet = std::max(minPossibleBet, getMoney()/5);
+	else if (round == 3)
+		maxPossibleBet = std::max(minPossibleBet, getMoney()/4);
+	else if (round == 4)
+		maxPossibleBet = std::max(minPossibleBet, getMoney()/3);
+	else if (round == 5)
+		maxPossibleBet = std::max(minPossibleBet, getMoney()/2);
+
+	if (minBet <= maxPossibleBet)
+		return true;
+	else
+		return false;
 }

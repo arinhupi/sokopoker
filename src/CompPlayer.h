@@ -17,6 +17,8 @@ public:
 	void changeCards(CardDeck&);
 	int bet(int minBet, int maxBet, int round, int bestScore);
 	void dispCards(bool firstHidden);
+private:
+	bool evalBetWithMoney(int round, int minBet);
 };
 
 #endif /* COMPPLAYER_H_ */
