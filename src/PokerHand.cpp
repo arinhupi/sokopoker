@@ -107,17 +107,18 @@ int PokerHand::countSameNumber(int suitResults[], int numberResults[], int& joke
 }
 
 int PokerHand::countSameSuit(int suitResults[], const int numberResults[], int& jokers) {
-	int bestRes = 0;
+	int bestRes = 0, bestSuit;
 	for (int i=0; i<Card::CARD_SUITS; i++){
 		if (suitResults[i] >= bestRes){
 			bestRes = suitResults[i];
+			bestSuit = i;
 		}
 	}
 	bestRes += jokers;
 	if (bestRes == 5)
-		return convertToScore(FLUSH, highestCardNumber(numberResults, jokers), 0);
+		return convertToScore(FLUSH, highestCardNumber(numberResults, jokers), bestSuit);
 	else if (bestRes == 4)
-		return convertToScore(FLUSH_OF_FOUR, highestCardNumber(numberResults, jokers), 0);
+		return convertToScore(FLUSH_OF_FOUR, highestCardNumber(numberResults, jokers), bestSuit);
 	else
 		return 0;
 }
@@ -178,8 +179,6 @@ void PokerHand::findIndexWithValue(const int numArr[], std::vector<std::pair<int
 	}
 }
 
-// this function is not used at the moment
-// does not support flush and straight of four
 bool PokerHand::markCardsOfScore(const PlayerCards& pCards, std::vector<bool>& markedCard) {
 	int handVal, firstVal, secVal;
 	breakupScore(handVal, firstVal, secVal);
@@ -201,6 +200,12 @@ bool PokerHand::markCardsOfScore(const PlayerCards& pCards, std::vector<bool>& m
 		break;
 	case HIGH_CARD:
 		findCardsWithValue(pCards, firstVal, markedCard);
+		break;
+	case FLUSH_OF_FOUR: // suit is store to secVal, in countSameSuit()
+		findCardsWithSuit(pCards, secVal, markedCard);
+		break;
+	case STRAIGHT_OF_FOUR:
+		findCardsOfStraightFour(pCards, firstVal, markedCard);
 		break;
 	case FIVE_OF_A_KIND:
 	case STRAIGHT_FLUSH:
@@ -228,6 +233,28 @@ void PokerHand::findCardsWithValue(const PlayerCards& pCards, int value, std::ve
 	for (unsigned int i=0; i<pCards.getCards().size(); i++){
 		Card c = pCards.getCards().at(i);
 		if (c.getNumber() == value || c.getSuit() == Card::JOKER){
+			cards.at(i) = true;
+		}
+	}
+}
+
+void PokerHand::findCardsWithSuit(const PlayerCards& pCards, int value, std::vector<bool>& cards) {
+	if (value == CARD_MAX_VALUE) value = 1;
+	for (unsigned int i=0; i<pCards.getCards().size(); i++){
+		Card c = pCards.getCards().at(i);
+		if (c.getSuit() == value || c.getSuit() == Card::JOKER){
+			cards.at(i) = true;
+		}
+	}
+}
+
+void PokerHand::findCardsOfStraightFour(const PlayerCards& pCards, int lowestValue, std::vector<bool>& cards) {
+	for (unsigned int i=0; i<pCards.getCards().size(); i++){
+		Card c = pCards.getCards().at(i);
+		int cNumber = c.getNumber();
+		if (cNumber == 1 && lowestValue == CARD_MAX_VALUE-3)
+			cNumber = CARD_MAX_VALUE;
+		if ((cNumber >= lowestValue && cNumber <= lowestValue+3) || c.getSuit() == Card::JOKER){
 			cards.at(i) = true;
 		}
 	}
@@ -290,3 +317,5 @@ void PokerHand::breakupScore(int& hand, int& firstVal, int& secVal) const{
 	firstVal = score/16 & 0x00f;
 	secVal = score & 0x00f;
 }
+
+

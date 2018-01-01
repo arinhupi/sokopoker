@@ -101,24 +101,83 @@ TEST_CASE("PokerHand getScore", "[PokerHand]"){
 	REQUIRE (hand == HIGH_CARD);
 	REQUIRE (firstVal == 14);
 
+	// flush with two jokers
+	testCards = { {Card::HEART,1}, {Card::JOKER,1}, {Card::JOKER,2}, {Card::HEART,6}, {Card::HEART,8}};
+	pCards.setCards(testCards);
+	ph.calcScoreOfHand(pCards, 0);
+	ph.breakupScore(hand, firstVal, secVal);
+	REQUIRE (hand == FLUSH);
+	REQUIRE (firstVal == 14);
+
 }
 
 TEST_CASE("PokerHand markCardsOfScore", "[PokerHand]"){
 	PokerHand ph;
 	std::vector<Card> testCards;
 	PlayerCards pCards;
+	std::vector<bool> markedCards(5);
 
+	// pair
 	testCards = { {Card::HEART,1}, {Card::CLUB,3}, {Card::DIAMOND,4}, {Card::SPADE,6}, {Card::HEART,6}};
 	pCards.setCards(testCards);
 	ph.calcScoreOfHand(pCards, 0);
-	std::vector<bool> markedCards(5);
 	ph.markCardsOfScore(pCards, markedCards);
 	REQUIRE(markedCards.at(0) == false);
 	REQUIRE(markedCards.at(1) == false);
 	REQUIRE(markedCards.at(2) == false);
 	REQUIRE(markedCards.at(3) == true);
 	REQUIRE(markedCards.at(4) == true);
+
+	// three of a kind
+	testCards = { {Card::JOKER,1}, {Card::CLUB,3}, {Card::DIAMOND,4}, {Card::SPADE,6}, {Card::HEART,6}};
+	pCards.setCards(testCards);
+	ph.calcScoreOfHand(pCards, 0);
+	markedCards.clear();
+	ph.markCardsOfScore(pCards, markedCards);
+	REQUIRE(markedCards.at(0) == true);
+	REQUIRE(markedCards.at(1) == false);
+	REQUIRE(markedCards.at(2) == false);
+	REQUIRE(markedCards.at(3) == true);
+	REQUIRE(markedCards.at(4) == true);
+
+	// flush of four
+	testCards = { {Card::HEART,2}, {Card::JOKER,1}, {Card::DIAMOND,4}, {Card::HEART,6}, {Card::HEART,10}};
+	pCards.setCards(testCards);
+	ph.calcScoreOfHand(pCards, 0);
+	markedCards.clear();
+	ph.markCardsOfScore(pCards, markedCards);
+	REQUIRE(markedCards.at(0) == true);
+	REQUIRE(markedCards.at(1) == true);
+	REQUIRE(markedCards.at(2) == false);
+	REQUIRE(markedCards.at(3) == true);
+	REQUIRE(markedCards.at(4) == true);
+
+	// straight of four
+	testCards = { {Card::HEART,2}, {Card::JOKER,2}, {Card::DIAMOND,4}, {Card::HEART,9}, {Card::SPADE,3}};
+	pCards.setCards(testCards);
+	ph.calcScoreOfHand(pCards, 0);
+	markedCards.clear();
+	ph.markCardsOfScore(pCards, markedCards);
+	REQUIRE(markedCards.at(0) == true);
+	REQUIRE(markedCards.at(1) == true);
+	REQUIRE(markedCards.at(2) == true);
+	REQUIRE(markedCards.at(3) == false);
+	REQUIRE(markedCards.at(4) == true);
+
+	// straight of four
+	testCards = { {Card::HEART,12}, {Card::JOKER,2}, {Card::DIAMOND,13}, {Card::HEART,11}, {Card::SPADE,3}};
+	pCards.setCards(testCards);
+	ph.calcScoreOfHand(pCards, 0);
+	markedCards.clear();
+	ph.markCardsOfScore(pCards, markedCards);
+	REQUIRE(markedCards.at(0) == true);
+	REQUIRE(markedCards.at(1) == true);
+	REQUIRE(markedCards.at(2) == true);
+	REQUIRE(markedCards.at(3) == true);
+	REQUIRE(markedCards.at(4) == false);
 }
+
+
 
 
 /*

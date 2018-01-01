@@ -70,6 +70,7 @@ private:
 	int highestCardNumber(const int numRes[], int jokers);
 	void findCardsWithValue(const PlayerCards& pCards, int, std::vector<bool>&);
 	void findCardsWithSuit(const PlayerCards& pCards, int, std::vector<bool>&);
+	void findCardsOfStraightFour(const PlayerCards& pCards, int, std::vector<bool>&);
 	int maxOfThree(int, int, int) const;
 	void setAllCards(std::vector<bool>&, bool);
 	std::string hexToCardVal(int) const;

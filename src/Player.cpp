@@ -28,7 +28,6 @@ void Player::addToDeck(Card card) {
 	playerCards.addToDeck(card);
 }
 
-
 void Player::changeCards(CardDeck& deck) {
 	std::cout << "Player::changeCards, virtual not implemented\n";
 }
