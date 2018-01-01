@@ -17,9 +17,7 @@
 
 
 class CardDeck {
-	std::vector<Card> cardDeck;
-	int cardsInDeck;
-	int curPosition;
+
 public:
 	static const int CARDDECK_WITH_JOKERS = 54;
 	static const int CARDDECK_WITHOUT_JOKERS = 52;
@@ -28,8 +26,21 @@ public:
 	virtual ~CardDeck();
 	void shuffle();
 	Card getFirstCard();
-	void displayDeck();
+	void displayDeck() const;
+
+	int getCardsInDeck() const {
+		return cardsInDeck;
+	}
+
+	int getCurPosition() const {
+		return curPosition;
+	}
+
 private:
+	std::vector<Card> cardDeck;
+	int cardsInDeck;
+	int curPosition;
+
 	void swapCards(int, int);
 };
 

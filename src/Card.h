@@ -20,20 +20,20 @@ class Card {
 public:
 	enum Suit{HEART, DIAMOND, CLUB, SPADE, JOKER};
 	static const int CARD_SUITS = 4;
-private:
-	int cardValue; //1...52 + 2 jokers
-public:
 	Card();
 	Card(int, int);
 	virtual ~Card();
 	void setValue(int);
-	void printCard();
-	int getSuit();
-	int getNumber();
+	void printCard() const;
+	int getSuit() const;
+	int getNumber() const;
 	std::string suitName(int);
-	std::string topRow();
-	std::string midRow();
-	std::string bottomRow();
+	std::string topRow() const;
+	std::string midRow() const;
+	std::string bottomRow() const;
+private:
+	int cardValue; //1...52 + 2 jokers
+
 };
 
 

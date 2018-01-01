@@ -17,11 +17,13 @@
 #include "PlayerCards.h"
 
 class Player {
+
 protected:
 	std::string playerName;
 	PlayerCards playerCards;
 	int money;
 	bool gameStatus; // false=quit
+
 public:
 	Player(std::string, int);
 	virtual ~Player();
@@ -31,8 +33,9 @@ public:
 	void reduceMoney(int reduced);
 	virtual void changeCards(CardDeck&);
 	virtual int bet(int minBet, int maxBet, int round, int bestScore);
+	virtual void printBetResult(int bet) const;
 	void resetCards();
-	virtual void dispCards(bool firstHidden);
+	virtual void dispCards(bool firstHidden) const;
 
 	const PlayerCards& getPlayerCards() const {
 		return playerCards;
@@ -62,8 +65,6 @@ public:
 		return money;
 	}
 
-private:
-	std::vector<int> &askCardNumbers();
 };
 
 

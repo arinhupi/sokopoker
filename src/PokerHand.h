@@ -8,7 +8,6 @@
 #ifndef POKERHAND_H_
 #define POKERHAND_H_
 
-//#include "PlayerCards.h"
 #include <vector>
 #include <map>
 #include <iostream>
@@ -29,18 +28,15 @@
 
 
 class PokerHand {
-	int score;
-	std::vector<bool> cardsOfHand;
-	static std::map<int, std::string> pHandStringFi;
-	static std::map<int, std::string> pHandStringEn;
+
 public:
 	static const int CARD_MAX_VALUE = 14;
 	PokerHand();
 	virtual ~PokerHand();
-	std::string printHand();
-	bool markCardsOfScore(const PlayerCards& plCards, int score, std::vector<bool>& markedCard);
-	void getScoreOfHand(const PlayerCards& plCards, int firstCardIndex);
-	void printScore();
+	std::string printHand() const;
+	bool markCardsOfScore(const PlayerCards& plCards, std::vector<bool>& markedCard);
+	int calcScoreOfHand(const PlayerCards& plCards, int firstCardIndex);
+	void printScore() const;
 
 	int getScore() const {
 		return score;
@@ -57,8 +53,14 @@ public:
 	void setCardsOfHand(const std::vector<bool>& cardsOfHand) {
 		this->cardsOfHand = cardsOfHand;
 	}
+	void breakupScore(int& hand, int& firstVal, int& secVal) const;
 
 private:
+	int score;
+	std::vector<bool> cardsOfHand;
+	static std::map<int, std::string> pHandStringFi;
+	static std::map<int, std::string> pHandStringEn;
+
 	int countSameNumber(int[], int[], int &);
 	int countSameSuit(int[], const int[], int &);
 	int countNumberSeq(int[], int[], int &);
@@ -68,11 +70,10 @@ private:
 	int highestCardNumber(const int numRes[], int jokers);
 	void findCardsWithValue(const PlayerCards& pCards, int, std::vector<bool>&);
 	void findCardsWithSuit(const PlayerCards& pCards, int, std::vector<bool>&);
-	int maxOfThree(int, int, int);
+	int maxOfThree(int, int, int) const;
 	void setAllCards(std::vector<bool>&, bool);
-	std::string hexToCardVal(int);
-	int convertToScore(int, int, int);
-	void breakupScore(int& hand, int& firstVal, int& secVal);
+	std::string hexToCardVal(int) const;
+	int convertToScore(int, int, int) const;
 };
 
 

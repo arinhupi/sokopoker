@@ -11,23 +11,21 @@
 #include <vector>
 #include <iostream>
 #include "Card.h"
-//#include "PokerHand.h"
 #include "CardDeck.h"
 
 
-
 class PlayerCards {
-	std::vector<Card> pCards;
 public:
 	PlayerCards();
 	virtual ~PlayerCards();
 	void addToDeck(Card card);
 	void dispCards();
 	void dispCards2();
-	void dispCards3(bool firstHidden);
+	void dispCards3(bool firstHidden) const;
 	void changeCard(CardDeck& deck, int cardNr);
 	void resetCards();
-	void setTestDeck(const std::vector<int> testCards);
+	int getCardAmount() const;
+	Card getCardAt(int cardNr) const;
 	const std::vector<Card>& getCards() const {
 		return pCards;
 	}
@@ -37,7 +35,8 @@ public:
 	}
 	typedef std::vector<Card>::iterator PCardIter;
 
-
+private:
+	std::vector<Card> pCards;
 };
 
 #endif /* PLAYERCARDS_H_ */

@@ -1,18 +1,7 @@
+#include "catch.hpp"
+#include "Card.h"
+
 /*
- * SokoGame.h
- *
- *  Created on: 11.9.2017
- *      Author: ari
- */
-
-#ifndef SOKOGAME_H_
-#define SOKOGAME_H_
-
-
-#include "CardDeck.h"
-#include "Player.h"
-#include "PokerHand.h"
-
 typedef struct {int player; int score;} PokRes;
 
 class SokoGame {
@@ -23,6 +12,7 @@ public:
     	SokoGame();
     	virtual ~SokoGame();
         void play();
+        void testHands();
         void autoPlay(int);
 private:
         //int roundNr;
@@ -43,4 +33,4 @@ private:
         int highestScoreId(std::vector<PokerHand>&) const;
 };
 
-#endif /* SOKOGAME_H_ */
+*/

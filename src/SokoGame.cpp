@@ -18,8 +18,6 @@
 #include "SokoGame.h"
 
 SokoGame::SokoGame() {
-	// TODO Auto-generated constructor stub
-
 }
 
 SokoGame::~SokoGame() {
@@ -30,7 +28,7 @@ bool compareByScore(const PokRes& a, const PokRes& b) {
 	return a.score < b.score;
 }
 
-void SokoGame::deal(std::vector<Player*>& pl, CardDeck& deck, int count, int round) {
+void SokoGame::deal(std::vector<Player*>& pl, CardDeck& deck, int count, int round) const {
 	if (round == 2)
 		std::cout << "\nDealing first two cards\n";
 	else if (round >2)
@@ -46,7 +44,7 @@ void SokoGame::deal(std::vector<Player*>& pl, CardDeck& deck, int count, int rou
 	}
 }
 
-void SokoGame::resetPlayerStatusAndCards(std::vector<Player*>& pl) {
+void SokoGame::resetPlayerStatusAndCards(std::vector<Player*>& pl) const {
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getMoney() > 0) {
 			pl.at(i)->setGameStatus(true);
@@ -57,8 +55,8 @@ void SokoGame::resetPlayerStatusAndCards(std::vector<Player*>& pl) {
 	}
 }
 
-int SokoGame::takeBets(std::vector<Player*>& pl, int round, int pot) {
-	if (round == 1) {
+int SokoGame::takeBets(std::vector<Player*>& pl, int cardNr, int pot) const {
+	if (cardNr == 1) {
 		int betSum = forceBet(pl, 5);
 		return betSum; // start betting after second card
 	}
@@ -77,7 +75,8 @@ int SokoGame::takeBets(std::vector<Player*>& pl, int round, int pot) {
 		if (pl.at(playerId)->getGameStatus() == true) {
 			minBet = getMinBet(pl, playerId, bets);
 			maxBet = getMaxBet(pl, bets);
-			curBet = pl.at(playerId)->bet(minBet, maxBet, round, pr.score);
+			curBet = pl.at(playerId)->bet(minBet, maxBet, cardNr, pr.score);
+			pl.at(playerId)->printBetResult(curBet);
 			bets.at(playerId) += curBet;
 			potti += curBet;
 		}
@@ -87,7 +86,7 @@ int SokoGame::takeBets(std::vector<Player*>& pl, int round, int pot) {
 	return potti;
 }
 
-int SokoGame::activePlayers(const std::vector<Player*>& pl) {
+int SokoGame::activePlayers(const std::vector<Player*>& pl) const{
 	int act = 0;
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true)
@@ -96,7 +95,7 @@ int SokoGame::activePlayers(const std::vector<Player*>& pl) {
 	return act;
 }
 
-bool SokoGame::checkBets(const std::vector<Player*>& pl, const std::vector<int>& bets) {
+bool SokoGame::checkBets(const std::vector<Player*>& pl, const std::vector<int>& bets) const {
 	int curBet, prevBet = -1;
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true) {
@@ -110,7 +109,8 @@ bool SokoGame::checkBets(const std::vector<Player*>& pl, const std::vector<int>&
 	return true;
 }
 
-int SokoGame::forceBet(std::vector<Player*>& pl, int bet) {
+
+int SokoGame::forceBet(std::vector<Player*>& pl, int bet) const{
 	int potti = 0;
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true && pl.at(i)->getMoney() >= bet) {
@@ -121,7 +121,7 @@ int SokoGame::forceBet(std::vector<Player*>& pl, int bet) {
 	return potti;
 }
 
-int SokoGame::getMinBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets) {
+int SokoGame::getMinBet(const std::vector<Player*>& pl, unsigned int plIndex, const std::vector<int>& bets) const {
 	int playerBet = bets.at(plIndex), highestBet = 0;
 	if (pl.at(plIndex)->getGameStatus() == false)
 		return 0;
@@ -138,7 +138,7 @@ int SokoGame::getMinBet(const std::vector<Player*>& pl, unsigned int plIndex, co
 }
 
 // find player with least amount of money
-int SokoGame::getMaxBet(const std::vector<Player*>&pl, const std::vector<int>& bets) {
+int SokoGame::getMaxBet(const std::vector<Player*>&pl, const std::vector<int>& bets) const {
 	int maxBet = std::numeric_limits<int>::max();
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true){
@@ -150,7 +150,7 @@ int SokoGame::getMaxBet(const std::vector<Player*>&pl, const std::vector<int>& b
 	return maxBet;
 }
 
-void SokoGame::dispAllCards(const std::vector<Player*>& pl, int round) {
+void SokoGame::dispAllCards(const std::vector<Player*>& pl, int round) const {
 	if (round == 1)
 		return;
 
@@ -164,7 +164,7 @@ void SokoGame::dispAllCards(const std::vector<Player*>& pl, int round) {
 	std::cout << "\n";
 }
 
-PokRes SokoGame::findBestHand(const std::vector<Player*>& pl, int startIndex) {
+PokRes SokoGame::findBestHand(const std::vector<Player*>& pl, int startIndex) const{
 	std::vector<PokerHand> phandVec(pl.size());
 	PokerHand pHand;
 	PlayerCards pCards;
@@ -173,7 +173,7 @@ PokRes SokoGame::findBestHand(const std::vector<Player*>& pl, int startIndex) {
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true) {
 			pCards = pl.at(i)->getPlayerCards();
-			pHand.getScoreOfHand(pCards, startIndex);
+			pHand.calcScoreOfHand(pCards, startIndex);
 			phandVec.at(i) = pHand;
 		} else
 			phandVec.at(i).setScore(0);
@@ -186,21 +186,21 @@ PokRes SokoGame::findBestHand(const std::vector<Player*>& pl, int startIndex) {
 	return pr;
 }
 
-void SokoGame::dispHands(const std::vector<Player*>& pl) {
+void SokoGame::dispHands(const std::vector<Player*>& pl) const{
 	PokerHand pHand;
 	PlayerCards pCards;
 
 	for (unsigned int i = 0; i < pl.size(); i++) {
 		if (pl.at(i)->getGameStatus() == true) {
 			pCards = pl.at(i)->getPlayerCards();
-			pHand.getScoreOfHand(pl.at(i)->getPlayerCards(), 0);
+			pHand.calcScoreOfHand(pl.at(i)->getPlayerCards(), 0);
 			std::cout << pl.at(i)->getPlayerName() << ":\t";
 			pHand.printHand();
 		}
 	}
 }
 
-void SokoGame::initPlayers(std::vector<Player*>& players) {
+void SokoGame::initPlayers(std::vector<Player*>& players) const {
 	HumanPlayer* player1 = new HumanPlayer("*You*", 100);
 	CompPlayer* player2 = new CompPlayer("Jussi", 100);
 	CompPlayer* player3 = new CompPlayer("Matti", 100);
@@ -210,7 +210,7 @@ void SokoGame::initPlayers(std::vector<Player*>& players) {
 	players.push_back(player3);
 }
 
-void SokoGame::showResultsOfRound(std::vector<Player*>& players, int potti, int round) {
+void SokoGame::showResultsOfRound(std::vector<Player*>& players, int potti, int round) const {
 	std::cout << "\n---- Results ----\n";
 	if (round == 5)
 		dispHands(players);
@@ -249,55 +249,7 @@ void SokoGame::play() {
 		delete players.at(i);
 }
 
-// for testing purposes
-void SokoGame::testHands() {
-	PokerHand ph;
-	std::vector<Card> testCards;
-	PlayerCards pCards;
-
-	// flush of four
-	testCards = { {Card::HEART,3}, {Card::SPADE,3}, {Card::HEART,4}, {Card::HEART,7}, {Card::HEART,9}};
-	pCards.setCards(testCards);
-	pCards.dispCards();
-	ph.getScoreOfHand(pCards, 0);
-	//ph = pCards.getScoreOfHand();
-	ph.printScore();
-
-	// straight of four
-	testCards = { {Card::HEART,3}, {Card::SPADE,3}, {Card::HEART,4}, {Card::HEART,5}, {Card::SPADE,6}};
-	pCards.setCards(testCards);
-	pCards.dispCards();
-	ph.getScoreOfHand(pCards, 0);
-	//ph = pCards.getScoreOfHand();
-	ph.printScore();
-
-	// flush
-	testCards = { {Card::HEART,3}, {Card::HEART,3}, {Card::HEART,10}, {Card::HEART,7}, {Card::HEART,9}};
-	pCards.setCards(testCards);
-	pCards.dispCards();
-	ph.getScoreOfHand(pCards, 0);
-	//ph = pCards.getScoreOfHand();
-	ph.printScore();
-
-	// värisuora
-	testCards = { {Card::HEART,3}, {Card::HEART,4}, {Card::HEART,5}, {Card::HEART,6}, {Card::HEART,7}};
-	pCards.setCards(testCards);
-	pCards.dispCards();
-	ph.getScoreOfHand(pCards, 0);
-	//ph = pCards.getScoreOfHand();
-	ph.printScore();
-
-	// värisuora
-	testCards = { {Card::HEART,3}, {Card::CLUB,3}, {Card::DIAMOND,3}, {Card::SPADE,3}, {Card::HEART,7}};
-	pCards.setCards(testCards);
-	pCards.dispCards();
-	ph.getScoreOfHand(pCards, 0);
-	//ph = pCards.getScoreOfHand();
-	ph.printScore();
-
-}
-
-int SokoGame::highestScoreId(std::vector<PokerHand>& ph) {
+int SokoGame::highestScoreId(std::vector<PokerHand>& ph) const{
 	int curBest = 0, playerIndex;
 	for (unsigned int i = 0; i < ph.size(); i++) {
 		int score = ph.at(i).getScore();

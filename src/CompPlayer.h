@@ -16,7 +16,8 @@ public:
 	virtual ~CompPlayer();
 	void changeCards(CardDeck&);
 	int bet(int minBet, int maxBet, int round, int bestScore);
-	void dispCards(bool firstHidden);
+	void printBetResult(int bet) const;
+	void dispCards(bool firstHidden) const;
 private:
 	bool evalBetWithMoney(int round, int minBet);
 };
